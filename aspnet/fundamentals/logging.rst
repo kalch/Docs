@@ -16,13 +16,12 @@ ASP.NET Core has built-in support for logging, and allows developers to easily l
 Implementing Logging in your Application
 ----------------------------------------
 
-Adding logging to a component in your application is done by requesting either an ``ILoggerFactory`` or an ``ILogger<T>`` via :doc:`dependency-injection`. If an ``ILoggerFactory`` is requested, a logger must be created using its ``CreateLogger`` method. The following example shows how to do this within the ``Configure`` method in the ``Startup`` class:
+Adding logging to a component in your application is done by requesting either an ``ILoggerFactory`` or an ``ILogger<T>`` via :doc:`dependency-injection`. If an ``ILoggerFactory`` is requested, a logger must be created using its ``CreateLogger`` method. The following example shows how to do this:
 
 .. literalinclude:: logging/sample/src/TodoApi/Startup.cs 
   :language: c#
-  :lines: 42-47
-  :dedent: 12
-  :emphasize-lines: 3,4
+  :lines: 54-55
+  :dedent: 16
 
 When a logger is created, a category name must be provided. The category name specifies the source of the logging events. By convention this string is hierarchical, with categories separated by dot (``.``) characters. Some logging providers have filtering support that leverages this convention, making it easier to locate logging output of interest. In this article's sample application, logging is configured to use the built-in `ConsoleLogger <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/Extensions/Logging/Console/ConsoleLogger/index.html>`_ (see `Configuring Logging in your Application`_ below). To see the console logger in action, run the sample application using the ``dotnet run`` command, and make a request to configured URL (``localhost:5000``). You should see output similar to the following:
 
@@ -34,7 +33,7 @@ The call to the log method can utilize a format string with named placeholders (
 
 .. literalinclude:: logging/sample/src/TodoApi/Startup.cs
   :language: c#
-  :lines: 45
+  :lines: 55
   :dedent: 16
 
 In your real world applications, you will want to add logging based on application-level, not framework-level, events. For instance, if you have created a Web API application for managing To-Do Items (see :doc:`/tutorials/first-web-api`), you might add logging around the various operations that can be performed on these items.
@@ -77,7 +76,7 @@ Error
   An error should be logged when the current flow of the application must stop due to some failure, such as an exception that cannot be handled or recovered from. These messages should indicate a failure in the current activity or operation (such as the current HTTP request), not an application-wide failure. Example: ``Cannot insert record due to duplicate key violation``
 
 Critical
-  A critical log level should be reserved for unrecoverable application or system crashes, or catastrophic failure that requires immediate attention. Examples: data loss scenarios, stack overflows, out of disk space
+  A critical log level should be reserved for unrecoverable application or system crashes, or catastrophic failure that requires immediate attention. Examples: data loss scenarios, out of disk space
 
 The ``Logging`` package provides `helper extension methods <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/Extensions/Logging/LoggerExtensions/index.html>`_ for each of these standard ``LogLevel`` values, allowing you to call ``LogInformation`` rather than the more verbose Log(LogLevel.Information, ...) method. Each of the ``LogLevel``-specific extension methods has several overloads, allowing you to pass in some or all of the following parameters:
 
@@ -141,9 +140,9 @@ A LoggerFactory instance can optionally be configured with custom ``FilterLogger
 
 .. literalinclude:: logging/sample/src/TodoApi/Startup.cs
   :language: c#
-  :lines: 21-31
-  :dedent: 8
-  :emphasize-lines: 5-11
+  :lines: 27-33
+  :dedent: 12
+
 
 .. note:: You can specify the minimum logging level each logger provider will use when you configure it. For example, the ``AddConsole`` extension method supports an optional parameter for setting its minimum ``LogLevel``.
 
@@ -158,34 +157,27 @@ First, be sure to add the ``Microsoft.Extensions.Logging.TraceSource`` package t
 
 .. literalinclude:: logging/sample/src/TodoApi/project.json
   :language: javascript
-  :lines: 8-20
-  :emphasize-lines: 11
+  :lines: 8-17
+  :emphasize-lines: 7
 
-The following example demonstrates how to configure two separate ``TraceSourceLogger`` instances for an application, both logging only ``Critical`` messages. Each call to ``AddTraceSource`` takes a ``TraceListener``. The first call configures a ``ConsoleTraceListener``; the second one configures an ``EventLogTraceListener`` to write to the ``Application`` event log. These two listeners are not available in .NET Core, so their configuration is wrapped in a conditional compilation statement.
+The following example demonstrates how to configure a ``TraceSourceLogger`` instance for an application, logging only ``Error`` or higher priority messages. Each call to ``AddTraceSource`` takes a ``TraceListener``. The call configures an ``EventLogTraceListener`` to write to the ``Application`` event log. This listener is not available in .NET Core, so this configuration is wrapped in a conditional compilation statement.
 
 .. literalinclude:: logging/sample/src/TodoApi/Startup.cs
   :language: c#
-  :lines: 40-48
+  :lines: 37-42
 
-The sample above also demonstrates setting the ``MinimumLevel`` on the logger factory. However, this specified level is simply the default for new factories, but can still be overridden by individually configured loggers. In this case, the ``sourceSwitch`` is configured to use ``SourceLevels.Critical``, so only ``Critical`` log messages are picked up by the two ``TraceListener`` instances.
+The ``sourceSwitch`` is configured to use ``SourceLevels.Error``, so only ``Error`` (or higher) log messages are picked up by the two ``TraceListener`` instances.
 
 To test out this code, replace the catch-all response with the following ``app.Run`` block:
 
-.. code-block:: c#
+.. literalinclude:: logging/sample/src/TodoApi/Startup.cs
+  :language: c#
+  :lines: 47-57
+  :dedent: 12
 
-  app.Run(async context =>
-  {
-    if (context.Request.Path.Value.Contains("boom"))
-    {
-      throw new Exception("boom!");
-    }
-    await context.Response.WriteAsync("Hello World!");
-  });
+With this change in place, when the application is run (on Windows with .NET 4.6.1), and a request is made to ``http://localhost:5000/boom``, the request fails. 
 
-
-With this change in place, when the application is run (on Windows), and a request is made to ``http://localhost:5000/boom``, the following is shown in the console output:
-
-.. image:: logging/_static/console-trace-boom.png
+.. note:: You can specify the framework to use when running an application by using the ``-f`` argument with ``dotnet run`` from the command line interface. For example, ``dotnet run -f NET461``. In Visual Studio, look for a Framework menu option in the IIS Express dropdown menu.
 
 Examining the Application event log in the Windows Event Viewer, the following event has also been logged as a result of this request:
 
@@ -224,4 +216,4 @@ The following are some recommendations you may find helpful when implementing lo
 Summary
 -------
 
-ASP.NET provides built-in support for logging, which can easily be configured within the ``Startup`` class and used throughout the application. Logging verbosity can be configured globally and per logging provider to ensure actionable information is logged appropriately. Built-in providers for console and trace source logging are included in the framework; other logging frameworks can easily be configured as well.
+ASP.NET Core provides built-in support for logging, which can easily be configured within the ``Startup`` class and used throughout the application. Logging verbosity can be configured globally and per logging provider to ensure actionable information is logged appropriately. Built-in providers for console and trace source logging are included in the framework; other logging frameworks can easily be configured as well.

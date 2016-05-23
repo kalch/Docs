@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,8 +34,11 @@ namespace TodoApi
 
             loggerFactory.AddConsole();
 
-#if NET451
-            loggerFactory.AddTraceSource()
+#if NET461
+            var sourceSwitch = new SourceSwitch("Logging Sample");
+            sourceSwitch.Level = SourceLevels.Error;
+            loggerFactory.AddTraceSource(sourceSwitch, 
+                new EventLogTraceListener("Application"));
 #endif
             app.UseStaticFiles();
 
@@ -42,6 +47,10 @@ namespace TodoApi
             // Create a catch-all response
             app.Run(async (context) =>
             {
+                if (context.Request.Path.Value.Contains("boom"))
+                {
+                    throw new Exception("boom!");
+                }
                 var logger = loggerFactory.CreateLogger("Catchall Endpoint");
                 logger.LogInformation("No endpoint found for request {path}", context.Request.Path);
                 await context.Response.WriteAsync("No endpoint found - try /api/todo.");
