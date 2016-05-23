@@ -30,6 +30,33 @@ To compile views, set the ``preserveCompilationContext`` option in ``project.jso
 
 You no longer need to reference the Tag Helper package ``Microsoft.AspNet.Mvc.TagHelpers``, which was renamed to ``Microsoft.AspNetCore.Mvc.TagHelpers`` in RC2. The package is now referenced by MVC by default.
 
+Controller and action result renames
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Following methods on the ``Controller`` base class have been renamed for the sake of consistency and making them less verbose.
+
+==================================  ==================
+RC1                                 RC2
+==================================  ==================
+HttpUnauthorized                    Unauthorized   
+HttpNotFound (and its overloads)    NotFound
+HttpBadRequest (and its overloads)  BadRequest
+==================================  ==================
+
+Following action result types have also been renamed. The Http prefix has been removed.
+
+===================================================  ===================================================
+RC1                                                  RC2
+===================================================  ===================================================
+Microsoft.AspNetCore.Mvc.HttpUnauthorizedResult      Microsoft.AspNetCore.Mvc.UnauthorizedResult
+Microsoft.AspNetCore.Mvc.HttpOkResult                Microsoft.AspNetCore.Mvc.OkResult
+Microsoft.AspNetCore.Mvc.HttpOkObjectResult          Microsoft.AspNetCore.Mvc.OkObjectResult
+Microsoft.AspNetCore.Mvc.HttpNotFoundResult          Microsoft.AspNetCore.Mvc.NotFoundResult
+Microsoft.AspNetCore.Mvc.HttpNotFoundObjectResult    Microsoft.AspNetCore.Mvc.NotFoundObjectResult
+Microsoft.AspNetCore.Mvc.HttpStatusCodeResult        Microsoft.AspNetCore.Mvc.StatusCodeResult
+===================================================  ===================================================
+
+
 Creating your web application host
 ----------------------------------
 
@@ -94,9 +121,9 @@ IHostingEnvironment changes
 
 All environment variables are now prefixed with the ``ASPNETCORE_`` prefix.
 
-===================================================  ===================================================  
-RC1                                                  RC2                           
-===================================================  ===================================================
+===================================================  ===================================================
+RC1                                                  RC2
+===================================================  ===================================================
 ASPNET_APP, ASPNET_APPLICATIONNAME, Hosting:App      ASPNETCORE_APPLICATIONNAME
 ASPNET_STARTUPASSEMBLY                               ASPNETCORE_STARTUPASSEMBLY
 ASPNET_DETAILEDERRORS, Hosting:DetailedErrors        ASPNETCORE_DETAILEDERRORS
@@ -107,6 +134,7 @@ ASPNET_CAPTURESTARTUPERRORS                          ASPNETCORE_CAPTURESTARTUPER
 ASPNET_SERVER.URLS                                   ASPNETCORE_SERVER.URLS
 ASPNET_CONTENTROOT, ASPNET_APPLICATIONBASE           ASPNETCORE_CONTENTROOT
 ===================================================  ===================================================
+
 
 In RC2, you can use whatever prefix you want. You should add it explicitly by calling:
 
@@ -371,7 +399,7 @@ The signatures for the following methods or properties have changed:
 ===============================================================  ===========================================
 RC1                                                              RC2
 ===============================================================  ===========================================
-ExternalLoginInfo.ExternalPrincipal()                            ExternalLoginInfo.Principal()
+ExternalLoginInfo.ExternalPrincipal                              ExternalLoginInfo.Principal
 User.IsSignedIn()                                                SignInManager.IsSignedIn(User)
 await UserManager.FindByIdAsync(HttpContext.User.GetUserId())    UserManager.GetUserAsync(HttpContext.User)
 User.GetUserId()                                                 UserManager.GetUserId(User)
