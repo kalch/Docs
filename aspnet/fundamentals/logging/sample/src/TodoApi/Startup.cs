@@ -22,8 +22,19 @@ namespace TodoApi
             IHostingEnvironment env,
             ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(minLevel:LogLevel.Trace);
+            loggerFactory
+                .WithFilter(new FilterLoggerSettings
+                {
+                    { "Microsoft", LogLevel.Warning },
+                    { "System", LogLevel.Warning },
+                    { "ToDoApi", LogLevel.Debug }
+                });
 
+            loggerFactory.AddConsole();
+
+#if NET451
+            loggerFactory.AddTraceSource()
+#endif
             app.UseStaticFiles();
 
             app.UseMvc();

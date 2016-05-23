@@ -20,11 +20,11 @@ Adding logging to a component in your application is done by requesting either a
 
 .. literalinclude:: logging/sample/src/TodoApi/Startup.cs 
   :language: c#
-  :lines: 21-38
-  :dedent: 8
-  :emphasize-lines: 3,14
+  :lines: 42-47
+  :dedent: 12
+  :emphasize-lines: 3,4
 
-When a logger is created, a category name must be provided. The category name specifies the source of the logging events. By convention this string is hierarchical, with categories separated by dot (``.``) characters. Some logging providers have filtering support that leverages this convention, making it easier to locate logging output of interest. In the above example, the logging is configured to use the built-in `ConsoleLogger <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/Extensions/Logging/Console/ConsoleLogger/index.html>`_ (see `Configuring Logging in your Application`_ below). To see the console logger in action, run the sample application using the ``dotnet run`` command, and make a request to configured URL (``localhost:5000``). You should see output similar to the following:
+When a logger is created, a category name must be provided. The category name specifies the source of the logging events. By convention this string is hierarchical, with categories separated by dot (``.``) characters. Some logging providers have filtering support that leverages this convention, making it easier to locate logging output of interest. In this article's sample application, logging is configured to use the built-in `ConsoleLogger <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/Extensions/Logging/Console/ConsoleLogger/index.html>`_ (see `Configuring Logging in your Application`_ below). To see the console logger in action, run the sample application using the ``dotnet run`` command, and make a request to configured URL (``localhost:5000``). You should see output similar to the following:
 
 .. image:: logging/_static/console-logger-output.png
 
@@ -34,7 +34,7 @@ The call to the log method can utilize a format string with named placeholders (
 
 .. literalinclude:: logging/sample/src/TodoApi/Startup.cs
   :language: c#
-  :lines: 35
+  :lines: 45
   :dedent: 16
 
 In your real world applications, you will want to add logging based on application-level, not framework-level, events. For instance, if you have created a Web API application for managing To-Do Items (see :doc:`/tutorials/first-web-api`), you might add logging around the various operations that can be performed on these items.
@@ -125,7 +125,6 @@ Debug          dbug
 Trace          trce
 =============  =============
 
-
 Scopes
 ^^^^^^
 
@@ -138,10 +137,17 @@ Configuring Logging in your Application
 
 To configure logging in your ASP.NET application, you should resolve ``ILoggerFactory`` in the ``Configure`` method in your ``Startup`` class. ASP.NET will automatically provide an instance of ``ILoggerFactory`` using :doc:`dependency-injection` when you add a parameter of this type to the ``Configure`` method. Once you've added ``ILoggerFactory`` as a parameter, you configure loggers within the ``Configure`` method by calling methods (or extension methods) on the logger factory. We have already seen an example of this configuration at the beginning of this article, when we added console logging by simply calling ``loggerFactory.AddConsole``.
 
-.. note:: You specify the minimum logging level each logger provider will use when you configure it. For example, the ``AddConsole`` extension method supports an optional parameter for setting its minimum ``LogLevel``.
+A LoggerFactory instance can optionally be configured with custom ``FilterLoggerSettings``. The example below configures custom log levels for different scopes, limiting system and Microsoft built-in logging to warnings while allowing the app to log at debug level by default.
 
-In addition to setting the minimum logging level, you can also specify that...
-.. TODO: cover the different overloads of AddConsole().
+.. literalinclude:: logging/sample/src/TodoApi/Startup.cs
+  :language: c#
+  :lines: 21-31
+  :dedent: 8
+  :emphasize-lines: 5-11
+
+.. note:: You can specify the minimum logging level each logger provider will use when you configure it. For example, the ``AddConsole`` extension method supports an optional parameter for setting its minimum ``LogLevel``.
+
+In addition to setting the minimum logging level, you can also specify that whether or not to include scope information in the output by setting ``includeScopes`` to ``true``. You can also specify a function to filter the log levels you wish to include (for example ``l => l >= LogLevel.Warning``) or a function to filter based on both log levels and category strings (for example, ``(category,loglevel) => category.Contains("MyController") && loglevel >= LogLevel.Trace``).
 
 Configuring TraceSource Logging
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -152,8 +158,8 @@ First, be sure to add the ``Microsoft.Extensions.Logging.TraceSource`` package t
 
 .. literalinclude:: logging/sample/src/TodoApi/project.json
   :language: javascript
-  :lines: 5-12
-  :emphasize-lines: 8
+  :lines: 8-20
+  :emphasize-lines: 11
 
 The following example demonstrates how to configure two separate ``TraceSourceLogger`` instances for an application, both logging only ``Critical`` messages. Each call to ``AddTraceSource`` takes a ``TraceListener``. The first call configures a ``ConsoleTraceListener``; the second one configures an ``EventLogTraceListener`` to write to the ``Application`` event log. These two listeners are not available in .NET Core, so their configuration is wrapped in a conditional compilation statement.
 
