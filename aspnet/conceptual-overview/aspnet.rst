@@ -60,7 +60,7 @@ The ASP.NET Core app is simply a console app that creates a web server in its ``
 Startup
 ---------------------------
 
-The ``Startup`` class (``UseStartup<Startup>`` in the code above) must be public and contain the following methods:
+The ``Startup`` class (``UseStartup<Startup>`` in the code below) must be public and contain the following methods:
 
 .. code-block:: c#
 
@@ -75,7 +75,7 @@ The ``Startup`` class (``UseStartup<Startup>`` in the code above) must be public
       }
   }
 
-- :doc:`ConfigureServices </fundamentals/startup>`  defines the services (see **Services** below) used by your app (such as the ASP.NET MVC Core framework, Entity Framework Core, Identity, etc. )
+- :doc:`ConfigureServices </fundamentals/startup>`  defines the services (see **Services** below) used by your app (such as the ASP.NET MVC Core framework, Entity Framework Core, Identity, etc.)
 - :doc:`Configure </fundamentals/startup>` defines the :doc:`middleware </fundamentals/middleware>` in the request pipeline
 - See :doc:`/fundamentals/startup`
 
@@ -105,7 +105,7 @@ You can use any `OWIN <http://owin.org>`_-based middleware with ASP.NET Core. Se
 Servers
 -------
 
-The ASP.NET Core hosting model does not directly listen for requests, rather it relies on an HTTP :doc:`server </fundamentals/servers>` implementation to forward the request to the application. The forwarded request is wrapped as a set of feature interfaces that the application then composes into an ``HttpContext``.  ASP.NET Core includes a managed cross-platform web server, called :ref:`Kestrel <kestrel>`, that you would typically run behind a production web server like `IIS <https://iis.net>`__ or `nginx <http://nginx.org>`__.
+The ASP.NET Core hosting model does not directly listen for requests; rather it relies on an HTTP :doc:`server </fundamentals/servers>` implementation to forward the request to the application. The forwarded request is wrapped as a set of feature interfaces that the application then composes into an ``HttpContext``.  ASP.NET Core includes a managed cross-platform web server, called :ref:`Kestrel <kestrel>`, that you would typically run behind a production web server like `IIS <https://iis.net>`__ or `nginx <http://nginx.org>`__.
 
 Web root
 --------
@@ -115,7 +115,7 @@ The web root of your app is the root location in your project from which HTTP re
 Configuration
 -------------
 
-ASP.NET Core uses a new configuration model for handling simple name-value pairs. The new configuration model is not based on ``System.Configuration`` or *web.config*.; rather, it pulls from an ordered set of configuration providers. The built-in configuration providers support a variety of file formats (XML, JSON, INI) and environment variables to enable environment-based configuration. You can also write your own custom configuration providers. Environments, like "Development"" and "Production", are a first-class notion in ASP.NET Core and can also be set using environment variables:
+ASP.NET Core uses a new configuration model for handling simple name-value pairs. The new configuration model is not based on ``System.Configuration`` or *web.config*; rather, it pulls from an ordered set of configuration providers. The built-in configuration providers support a variety of file formats (XML, JSON, INI) and environment variables to enable environment-based configuration. You can also write your own custom configuration providers. Environments, like "Development"" and "Production", are a first-class notion in ASP.NET Core and can also be set using environment variables.
 
 .. literalinclude:: /../common/samples/WebApplication1/src/WebApplication1/Startup.cs
   :language: c#
