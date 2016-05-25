@@ -5,7 +5,7 @@ ASP.NET Core Module Configuration Reference
 
 By `Rick Anderson`_
 
-In ASP.NET Core, the web application is hosted by an external process outside of IIS. The ASP.NET Core Module is an IIS 7.5+ module which is responsible for process management of  ASP.NET Core http listeners and to proxy requests to processes that it manages. This document provides an overview of how to configure the HTTP Platform Handler module for shared hosting of ASP.NET Core.
+In ASP.NET Core, the web application is hosted by an external process outside of IIS. The ASP.NET Core Module is an IIS 7.5+ module which is responsible for process management of  ASP.NET Core http listeners and to proxy requests to processes that it manages. This document provides an overview of how to configure the ASP.NET Core Module for shared hosting of ASP.NET Core.
 
 .. contents:: Sections:
   :local:
@@ -76,7 +76,7 @@ Configuration Attributes
 | requestTimeout            | | Optional timespan  attribute.                    |
 |                           | |                                                  |
 |                           | | Specifies the duration for which the             |
-|                           | | ASP.NET Core module will wait for a response     |
+|                           | | ASP.NET Core Module will wait for a response     |
 |                           | | from the process listening on                    |
 |                           | | %HTTP_PLATFORM_PORT%.                            |
 |                           | |                                                  |
@@ -132,7 +132,7 @@ ASP.NET Core Module Configuration Examples
 Log Redirection
 ^^^^^^^^^^^^^^^
 
-The ASP.NET Core module can redirect ``stdout`` and ``stderr`` logs to disk by setting the ``stdoutLogEnabled``  and ``stdoutLogFile`` properties of the ``aspNetCore`` attribute. However, the HTTP Platform Handler module does not rotate logs and it is the responsibilty of the hoster to limit the disk space the logs consume.
+The ASP.NET Core Module can redirect ``stdout`` and ``stderr`` logs to disk by setting the ``stdoutLogEnabled``  and ``stdoutLogFile`` properties of the ``aspNetCore`` attribute. However, the ASP.NET Core Module does not rotate logs and it is the responsibilty of the hoster to limit the disk space the logs consume.
 
 .. literalinclude:: aspnet-core-module/sample/web.config
   :language: xml
@@ -142,7 +142,7 @@ The ASP.NET Core module can redirect ``stdout`` and ``stderr`` logs to disk by s
 Setting Environment Variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ASP.NET Core module allows you specify environment variables for the process specified in the ``processPath`` setting by specifying them in ``environmentVariables`` child attribute to the ``aspNetCore`` attribute. The example below illustrates how you would use it.
+The ASP.NET Core Module allows you specify environment variables for the process specified in the ``processPath`` setting by specifying them in ``environmentVariables`` child attribute to the ``aspNetCore`` attribute. The example below illustrates how you would use it.
 
 .. literalinclude:: aspnet-core-module/sample/web.config
   :language: xml
