@@ -1,7 +1,7 @@
 .. _apppool:
 
 ASP.NET Core Module Configuration Reference
-============================================
+=============================================
 
 By `Rick Anderson`_
 
@@ -70,7 +70,7 @@ Configuration Attributes
 | requestTimeout            | | Optional timespan  attribute.                    |
 |                           | |                                                  |
 |                           | | Specifies the duration for which the             |
-|                           | | ASP.NET Core module will wait for a response    |
+|                           | | ASP.NET Core module will wait for a response     |
 |                           | | from the process listening on                    |
 |                           | | %HTTP_PLATFORM_PORT%.                            |
 |                           | |                                                  |
