@@ -1,5 +1,3 @@
-.. _apppool:
-
 ASP.NET Core Module Configuration Reference
 =============================================
 
