@@ -12,26 +12,21 @@ ASP.NET Core is a significant redesign of ASP.NET. This topic introduces the new
 What is ASP.NET Core?
 ---------------------
 
-ASP.NET Core is a new open-source and cross-platform framework for building modern cloud based internet connected applications, such as web apps, IoT apps and mobile backends. We built it from the ground up to provide an optimized development framework for apps that are deployed to the cloud or run on-premises. It consists of modular components with minimal overhead, so you retain flexibility while constructing your solutions. You can develop and run your ASP.NET Core apps cross-platform on Windows, Mac and Linux. ASP.NET Core is open source at `GitHub <https://github.com/aspnet/home>`_.
+ASP.NET Core is a new open-source and cross-platform framework for building modern cloud based internet connected applications, such as web apps, IoT apps and mobile backends. ASP.NET Core apps can run on `.NET Core <https://www.microsoft.com/net/core/platform>`__ or on the full .NET Framework. It was architected to provide an optimized development framework for apps that are deployed to the cloud or run on-premises. It consists of modular components with minimal overhead, so you retain flexibility while constructing your solutions. You can develop and run your ASP.NET Core apps cross-platform on Windows, Mac and Linux. ASP.NET Core is open source at `GitHub <https://github.com/aspnet/home>`_.
 
 Why build ASP.NET Core?
 -----------------------
 
 The first preview release of ASP.NET came out almost 15 years ago as part of the .NET Framework.  Since then millions of developers have used it to build and run great web apps, and over the years we have added and evolved many capabilities to it.
 
-ASP.NET Core has a number of architectural changes that result in a much leaner and modular framework. ASP.NET Core is no longer based on *System.Web.dll*. It is based on a set of granular and well factored `NuGet <http://www.nuget.org/>`__ packages. This allows you to optimize your app to include just the NuGet packages you need. The benefits of a smaller app surface area include tighter security, reduced servicing, improved performance, and decreased costs in a pay-for-what-you-use model.
+ASP.NET Core has a number of architectural changes that result in a much leaner and modular framework.  ASP.NET Core is no longer based on *System.Web.dll*. It is based on a set of granular and well factored `NuGet <http://www.nuget.org/>`__ packages. This allows you to optimize your app to include just the NuGet packages you need. The benefits of a smaller app surface area include tighter security, reduced servicing, improved performance, and decreased costs in a pay-for-what-you-use model.
 
-ASP.NET Core is built with the needs of modern web apps in mind:
+With ASP.NET Core you gain the following foundational improvements:
 
 - A unified story for building web UI and web APIs
 - Integration of :doc:`modern client-side frameworks </client-side/index>` and development workflows
 - A cloud-ready environment-based :doc:`configuration system </fundamentals/configuration>`
 - Built-in :doc:`dependency injection </fundamentals/dependency-injection>` 
-
-ASP.NET Core supports cross-platform development on Windows, Mac and Linux. The `ASP.NET Core stack <https://github.com/aspnet>`__ is open source and encourages community contributions and engagement. ASP.NET Core comes with a new, agile project system in Visual Studio and a complete command-line interface, so that you can develop using the tools of your choice. `Visual Studio Code <https://code.visualstudio.com/#alt-downloads>`__ runs on a variety of platforms.
-
-With ASP.NET Core you gain the following foundational improvements:
-
 - New light-weight and modular HTTP request pipeline
 - Ability to host on IIS or self-host in your own process
 - Built on `.NET Core`_, which supports true side-by-side app versioning
@@ -49,18 +44,17 @@ Application anatomy
 
 .. comment In RC1, The work of the WebHostBuilder was hidden in dnx.exe
 
-An ASP.NET Core app self-hosts in a console app using ``IWebHost``. 
+An ASP.NET Core app is simply a console app that creates a web server in its ``Main`` method: 
 
 .. literalinclude:: /getting-started/sample/aspnetcoreapp/Program.cs
     :language: c#
     
-The ASP.NET Core app is simply a console app that creates a web server in its ``Main`` method. ``Main`` uses `WebHostBuilder <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/AspNet/Hosting/WebHostBuilder/index.html>`__ , which follows the builder pattern, to create a hosting engine for ``IWebHost`` and to build the HTTP pipeline. The builder has methods that define the web server type (for example ``UseKestrel``) and the startup class (``UseStartup``). In the example above, the Kestrel web server is used, but other web servers can be specified. We'll show more about ``UseStartup`` in the next section. ``WebHostBuilder`` provides many optional methods including ``UseIISIntegration`` for hosting in IIS and IIS Express and ``UseContentRoot`` for specifying the root content directory. The ``Build`` and ``Run`` methods build the ``IWebHost`` that will host the app and start it listening for incoming HTTP requests.
+The ASP.NET Core app is simply a console app that creates a web server in its ``Main`` method. ``Main`` uses `WebHostBuilder <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/AspNet/Hosting/WebHostBuilder/index.html>`__ , which follows the builder pattern, to create a web application host. The builder has methods that define the web server type (for example ``UseKestrel``) and the startup class (``UseStartup``). In the example above, the Kestrel web server is used, but other web servers can be specified. We'll show more about ``UseStartup`` in the next section. ``WebHostBuilder`` provides many optional methods including ``UseIISIntegration`` for hosting in IIS and IIS Express and ``UseContentRoot`` for specifying the root content directory. The ``Build`` and ``Run`` methods build the ``IWebHost`` that will host the app and start it listening for incoming HTTP requests.
 
 
 Startup
 ---------------------------
-
-The ``Startup`` class (``UseStartup<Startup>`` in the code below) must be public and contain the following methods:
+The ``Startup`` class is where the you define the request handling pipeline and where any services needed by the app are configured. The ``Startup`` class (``UseStartup<Startup>`` in the code below) must be public and contain the following methods:
 
 .. code-block:: c#
 
@@ -75,16 +69,14 @@ The ``Startup`` class (``UseStartup<Startup>`` in the code below) must be public
       }
   }
 
-- :doc:`ConfigureServices </fundamentals/startup>`  defines the services (see **Services** below) used by your app (such as the ASP.NET MVC Core framework, Entity Framework Core, Identity, etc.)
-- :doc:`Configure </fundamentals/startup>` defines the :doc:`middleware </fundamentals/middleware>` in the request pipeline
+- ``ConfigureServices`` defines the services (see **Services** below) used by your app (such as the ASP.NET MVC Core framework, Entity Framework Core, Identity, etc.)
+- ``Configure`` defines the :doc:`middleware </fundamentals/middleware>` in the request pipeline
 - See :doc:`/fundamentals/startup`
 
 Services
 --------
 
 A service is a component that is intended for common consumption in an application. Services are made available through dependency injection. ASP.NET Core includes a simple built-in inversion of control (IoC) container that supports constructor injection by default, but can be easily replaced with your IoC container of choice. In addition to its loose coupling benefit, DI makes services available throughout your app. For example, :doc:`Logging </fundamentals/logging>` is available throughout your app. See :doc:`/fundamentals/dependency-injection` for more details.
-
-Services in ASP.NET Core come in three varieties: transient, scoped, and singleton. Transient services are created each time they’re requested from the container. Transient works best  for lightweight, stateless services. Scoped services are created only if they don’t already exist in the current scope. For web apps, a container scope is created for each request, so you can think of scoped services as per request. Singleton services are only created once per application. See `Service Lifetimes and Registration Options <https://docs.asp.net/en/latest/fundamentals/dependency-injection.html#service-lifetimes-and-registration-options>`__ for more information.
 
 Middleware
 ----------
@@ -93,7 +85,7 @@ In ASP.NET Core you compose your request pipeline using :doc:`/fundamentals/midd
 
 ASP.NET Core comes with a rich set of prebuilt middleware:
 
-- :doc:`Static file service </fundamentals/static-files>`
+- Static files with the :doc:`Static file service </fundamentals/static-files>`
 - :doc:`/fundamentals/routing`
 - :doc:`/fundamentals/diagnostics`
 - :doc:`/security/authentication/index`
@@ -112,25 +104,30 @@ Web root
 
 The web root of your app is the root location in your project from which HTTP requests are handled (for example handling of static file requests). The web root of an ASP.NET Core app is configured using the ``webroot`` property in the *project.json* file.
 
+Content root
+------------
+
+
 Configuration
 -------------
 
-ASP.NET Core uses a new configuration model for handling simple name-value pairs. The new configuration model is not based on ``System.Configuration`` or *web.config*; rather, it pulls from an ordered set of configuration providers. The built-in configuration providers support a variety of file formats (XML, JSON, INI) and environment variables to enable environment-based configuration. You can also write your own custom configuration providers. Environments, like "Development"" and "Production", are a first-class notion in ASP.NET Core and can also be set using environment variables.
+ASP.NET Core uses a new configuration model for handling simple name-value pairs. The new configuration model is not based on ``System.Configuration`` or *web.config*; rather, it pulls from an ordered set of configuration providers. The built-in configuration providers support a variety of file formats (XML, JSON, INI) and environment variables to enable environment-based configuration. You can also write your own custom configuration providers. 
 
-.. literalinclude:: /../common/samples/WebApplication1/src/WebApplication1/Startup.cs
-  :language: c#
-  :lines: 22-34
-  :dedent: 12
+See :doc:`/fundamentals/configuration` for more information.
 
-See :doc:`/fundamentals/configuration` for more details on the new configuration system and :doc:`/fundamentals/environments` for details on how to work with environments in ASP.NET Core.
+Environments
+---------------------
+
+Environments, like "Development" and "Production", are a first-class notion in ASP.NET Core and can  be set using environment variables. See :doc:`/fundamentals/environments` for more information.
 
 Build web UI and web APIs using MVC
 -----------------------------------
 
-- ASP.NET Core helps you create well-factored and testable web apps. See :doc:`/mvc/index` and :doc:`/testing/index`.
+- ASP.NET Core helps you create well-factored and testable web apps that follow the Model-View-Controller (MVC) pattern. See :doc:`/mvc/index` and :doc:`/testing/index`.
 - `Razor <http://www.asp.net/web-pages/overview/getting-started/introducing-razor-syntax-c>`__ provides a productive language to create :doc:`Views </mvc/views/index>`
-- :doc:`Tag Helpers </mvc/views/tag-helpers/intro>` enable server-side code to participate in creating and rendering HTML elements in Razor files. Tag Helpers are one of the most popular new features of ASP.NET Core Mvc
+- :doc:`Tag Helpers </mvc/views/tag-helpers/intro>` enable server-side code to participate in creating and rendering HTML elements in Razor files. 
 - You can create HTTP services with full support for content negotiation using custom or built-in formatters (JSON, XML)
+- 
 
 Client-side development
 -----------------------
