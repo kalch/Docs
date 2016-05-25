@@ -26,7 +26,7 @@ With ASP.NET Core you gain the following foundational improvements:
 - A unified story for building web UI and web APIs
 - Integration of :doc:`modern client-side frameworks </client-side/index>` and development workflows
 - A cloud-ready environment-based :doc:`configuration system </fundamentals/configuration>`
-- Built-in :doc:`dependency injection </fundamentals/dependency-injection>` 
+- Built-in :doc:`dependency injection </fundamentals/dependency-injection>`
 - New light-weight and modular HTTP request pipeline
 - Ability to host on IIS or self-host in your own process
 - Built on `.NET Core`_, which supports true side-by-side app versioning
@@ -44,11 +44,11 @@ Application anatomy
 
 .. comment In RC1, The work of the WebHostBuilder was hidden in dnx.exe
 
-An ASP.NET Core app is simply a console app that creates a web server in its ``Main`` method: 
+An ASP.NET Core app is simply a console app that creates a web server in its ``Main`` method:
 
 .. literalinclude:: /getting-started/sample/aspnetcoreapp/Program.cs
     :language: c#
-    
+
 The ASP.NET Core app is simply a console app that creates a web server in its ``Main`` method. ``Main`` uses `WebHostBuilder <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/AspNet/Hosting/WebHostBuilder/index.html>`__ , which follows the builder pattern, to create a web application host. The builder has methods that define the web server type (for example ``UseKestrel``) and the startup class (``UseStartup``). In the example above, the Kestrel web server is used, but other web servers can be specified. We'll show more about ``UseStartup`` in the next section. ``WebHostBuilder`` provides many optional methods including ``UseIISIntegration`` for hosting in IIS and IIS Express and ``UseContentRoot`` for specifying the root content directory. The ``Build`` and ``Run`` methods build the ``IWebHost`` that will host the app and start it listening for incoming HTTP requests.
 
 
@@ -111,7 +111,7 @@ Content root
 Configuration
 -------------
 
-ASP.NET Core uses a new configuration model for handling simple name-value pairs. The new configuration model is not based on ``System.Configuration`` or *web.config*; rather, it pulls from an ordered set of configuration providers. The built-in configuration providers support a variety of file formats (XML, JSON, INI) and environment variables to enable environment-based configuration. You can also write your own custom configuration providers. 
+ASP.NET Core uses a new configuration model for handling simple name-value pairs. The new configuration model is not based on ``System.Configuration`` or *web.config*; rather, it pulls from an ordered set of configuration providers. The built-in configuration providers support a variety of file formats (XML, JSON, INI) and environment variables to enable environment-based configuration. You can also write your own custom configuration providers.
 
 See :doc:`/fundamentals/configuration` for more information.
 
@@ -125,9 +125,10 @@ Build web UI and web APIs using MVC
 
 - ASP.NET Core helps you create well-factored and testable web apps that follow the Model-View-Controller (MVC) pattern. See :doc:`/mvc/index` and :doc:`/testing/index`.
 - `Razor <http://www.asp.net/web-pages/overview/getting-started/introducing-razor-syntax-c>`__ provides a productive language to create :doc:`Views </mvc/views/index>`
-- :doc:`Tag Helpers </mvc/views/tag-helpers/intro>` enable server-side code to participate in creating and rendering HTML elements in Razor files. 
+- :doc:`Tag Helpers </mvc/views/tag-helpers/intro>` enable server-side code to participate in creating and rendering HTML elements in Razor files
 - You can create HTTP services with full support for content negotiation using custom or built-in formatters (JSON, XML)
-- 
+- :doc:`/mvc/models/model-binding` automatically maps data from HTTP requests to action method parameters
+- :doc:`/mvc/models/validation` automatically performs client and server side validation
 
 Client-side development
 -----------------------
