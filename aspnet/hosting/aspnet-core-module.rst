@@ -3,7 +3,7 @@
 ASP.NET Core Module Configuration Reference
 =============================================
 
-By `Rick Anderson`_
+By `Rick Anderson`_ and `Sourabh Shirhatti`_
 
 In ASP.NET Core, the web application is hosted by an external process outside of IIS. The ASP.NET Core Module is an IIS 7.5+ module which is responsible for process management of  ASP.NET Core http listeners and to proxy requests to processes that it manages. This document provides an overview of how to configure the ASP.NET Core Module for shared hosting of ASP.NET Core.
 
@@ -19,7 +19,7 @@ Install the `.NET Core Windows Server Hosting <http://go.microsoft.com/fwlink/?L
 Configuring the ASP.NET Core Module
 -----------------------------------
 
-The ASP.NET Core Module is configured via a site or application's *web.config* file and has its own configuration section within ``system.webServer - aspNetCore``.
+The ASP.NET Core Module is configured via a site or application *web.config* file and has its own configuration section within ``system.webServer - aspNetCore``.
 
 Configuration Attributes
 ^^^^^^^^^^^^^^^^^^^^^^^^^
