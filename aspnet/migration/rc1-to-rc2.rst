@@ -14,12 +14,22 @@ ASP.NET 5 RC1 apps were based on the .NET Execution Environment (DNX) and made u
 
 For information regarding a complete list of breaking changes in RC2 for ASP.NET Core, see the `ASP.NET Core Announcements page <https://github.com/aspnet/announcements/issues?q=is%3Aopen+is%3Aissue+milestone%3A1.0.0-rc2>`_
 
+Namespace and package ID changes
+---------------------------------- 
+
+ASP.NET 5 was renamed to ASP.NET Core 1.0. Also, MVC and Identity are now part of ASP.NET Core. ASP.NET MVC 6 is now ASP.NET Core MVC. ASP.NET Identity 3 is now ASP.NET Core Identity.
+
+All Microsoft.AspNet.\* namespaces are renamed to Microsoft.AspNetCore.\*. 
+The EntityFramework.\* packages and namespaces are changing to Microsoft.EntityFrameworkCore.\*.
+All ASP.NET Core package versions are now 1.0.0-\*.
+Microsoft.Data.Entity.* is now Microsoft.EntityFrameworkCore.*
+
 Changes in MVC
 --------------
 
 To compile views, set the ``preserveCompilationContext`` option in ``project.json`` to preserve the compilation context, as shown here:
 
-.. code-block:: c#  
+.. code-block:: json 
 
   {
     "buildOptions": {
@@ -30,10 +40,10 @@ To compile views, set the ``preserveCompilationContext`` option in ``project.jso
 
 You no longer need to reference the Tag Helper package ``Microsoft.AspNet.Mvc.TagHelpers``, which was renamed to ``Microsoft.AspNetCore.Mvc.TagHelpers`` in RC2. The package is now referenced by MVC by default.
 
-Controller and action result renames
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Controller and action results renamed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Following methods on the ``Controller`` base class have been renamed for the sake of consistency and making them less verbose.
+The following methods on the ``Controller`` base class have been renamed.
 
 ==================================  ==================
 RC1                                 RC2
@@ -43,7 +53,7 @@ HttpNotFound (and its overloads)    NotFound
 HttpBadRequest (and its overloads)  BadRequest
 ==================================  ==================
 
-Following action result types have also been renamed. The Http prefix has been removed.
+The following action result types have also been renamed. 
 
 ===================================================  ===================================================
 RC1                                                  RC2
@@ -56,6 +66,61 @@ Microsoft.AspNetCore.Mvc.HttpNotFoundObjectResult    Microsoft.AspNetCore.Mvc.No
 Microsoft.AspNetCore.Mvc.HttpStatusCodeResult        Microsoft.AspNetCore.Mvc.StatusCodeResult
 ===================================================  ===================================================
 
+Changes in views
+^^^^^^^^^^^^^^^^
+
+Views now support relative paths. 
+
+The Validation Summary Tag Helper has changed. 
+
+RC1:
+
+.. code-block:: html 
+
+  <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div> 
+
+RC2:
+
+.. code-block:: html
+
+  <div asp-validation-summary="All" class="text-danger"></div>
+
+ViewComponents changes
+^^^^^^^^^^^^^^^^^^^^^^
+
+The sync APIs have been removed.
+
+To reduce ambiguity in ViewComponent method selection, we've modified the selection to only allow exactly one ``Invoke()`` or ``InvokeAsync()`` per ViewComponent.
+``Component.Render()``, ``Component.RenderAsync()``, and ``Component.Invoke()`` have been removed.
+
+``InvokeAsync()`` now takes an anonynmous object instead of separate parameters. To use the view component, call @Component.InvokeAsync("Name of view component", <parameters>) from a view. The parameters will be passed to the ``InvokeAsync()`` method. The following example demonstrates the ``InvokeAsync()`` method call with two parameters:
+
+.. code-block:: c#  
+
+  // RC1 signature 
+  @Component.InvokeAsync("Test", "MyName", 15)  
+
+  // RC2 signatures
+  @Component.InvokeAsync("Test", new { name = "MyName", age = 15 })
+ 
+  @Component.InvokeAsync("Test", new Dictionary<string, object> { ["name"] = "MyName", ["age"] = 15 })
+
+  @Component.InvokeAsync<TestViewComponent>(new { name = "MyName", age = 15})
+
+Updated controller discovery rules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are changes that simplify controller discovery:
+
+There is a new ``Controller`` attribute that can be used to mark a class and their descendants as controllers.
+Classes whose name doesn't end in ``Controller`` and derive from a base class that ends in ``Controller`` are no longer considered controllers. In this scenario the ``[Controller]`` attribute must be applied to the ``Controller`` class itself or to the base class.
+
+We now consider a type to be a controller if all of the following rules apply:
+
+- The type is a public, concrete, non open generic class.
+- [NonController] is not applied to any type of the hierarchy.
+- The type name ends with ``Controller``, or if the ``[Controller]`` attribute is applied to the type or to one of its ancestors.
+- It's important to note that if ``[NonController]`` is applied anywhere in the type hierarchy the discovery conventions will never consider that type or its descendants to be a controller. ``[NonController]`` takes precedence over ``[Controller]``.
 
 Creating your web application host
 ----------------------------------
@@ -84,16 +149,15 @@ The web root of your application is no longer specified in your ``project.json``
 
 Additionally, you must turn on server garbage collection in ``project.json`` or, ``app.config`` when running ASP.NET projects on the full .NET framework.
 
-.. code-block:: c#
+.. code-block:: json
 
-  {
-    "runtimeOptions": {
-      "gcServer": false,
-      "gcConcurrent": true
+  "runtimeOptions": {
+    "configProperties": {
+      "System.GC.Server": true
     }
-  }  
-
-You can find more information about Garbage Collection configuration at: https://github.com/aspnet/Announcements/issues/175
+  }
+  
+"The default server URL and port are ``localhost:5000``. You can find more information about Garbage Collection configuration at: https://github.com/aspnet/Announcements/issues/175
 
 WebHostBuilder API updates
 --------------------------
@@ -135,21 +199,13 @@ ASPNET_SERVER.URLS                                   ASPNETCORE_SERVER.URLS
 ASPNET_CONTENTROOT, ASPNET_APPLICATIONBASE           ASPNETCORE_CONTENTROOT
 ===================================================  ===================================================
 
-
-In RC2, you can use whatever prefix you want. You should add it explicitly by calling:
+We still support ``ASPNET_ENV`` and ``Hosting:Environment`` in RC2, but the user will see a message indicating these values are deprecated. In RC2, you can use whatever prefix you want. You should add it explicitly by calling:
 
 .. code-block:: c#
 
-  new ConfigurationBuilder.AddEnvironmentVariables(“ANY_PREFIX_YOU_WANT_”).Build(); 
+  new ConfigurationBuilder.AddEnvironmentVariables("ANY_PREFIX_YOU_WANT_").Build(); 
   
 However, there is an exception. You must set the environment key using ``ASPNETCORE_ENVIRONMENT``. This is picked up by default by the ``WebHostBuilder``, unlike the other variables. 
-
-ASP.NET 5 was renamed to ASP.NET Core 1.0. Also, MVC and Identity are now part of ASP.NET Core. ASP.NET MVC 6 is now ASP.NET Core MVC. ASP.NET Identity 3 is now ASP.NET Core Identity.
-
-The hosting configuration keys are now consistent with the command line, environment variables, and ``hosting.json`` values. The ``Microsoft.AspNet.Hosting.json`` configuration file was renamed to ``hosting.json``.
-
-``hosting.json`` is no longer read by default, users need to explicitly add their own configuration sources and pass a configuration to ``WebHostBuilder``. The default server URL and port are ``localhost:5000``.
-
 
 Runtime Services Changes
 ------------------------
@@ -176,37 +232,28 @@ To:
       .SetBasePath(hostingEnvironment.ContentRootPath);
   }
 
-  
-Namespace and package ID changes
----------------------------------- 
-
-All Microsoft.AspNet.\* namespaces are renamed to Microsoft.AspNetCore.\*. 
-The EntityFramework.\* packages and namespaces are changing to Microsoft.EntityFrameworkCore.\*.
-All ASP.NET Core package versions are now 1.0.0-\*.
-Microsoft.Data.Entity.* is now Microsoft.EntityFrameworkCore.*
 
 Working with IIS
 ----------------
 
-HttpPlatformModule
-^^^^^^^^^^^^^^^^^^
-
 ``Microsoft.AspNetCore.IISPlatformHandler`` is now ``Microsoft.AspNetCore.Server.IISIntegration``.
 
-HttpPlatformModule was replaced by ASP.NET Core Module. The ``web.config`` created by the Publish IIS tool now configures IIS to use ASP.NET Core Module instead of HttpPlatformHandler to reverse-proxy requests to Kestrel.
+HTTP Platform Handler was replaced by ASP.NET Core Module. The ``web.config`` created by the Publish IIS tool now configures IIS to use ASP.NET Core Module instead of HttpPlatformHandler to reverse-proxy requests to Kestrel.
 
 The code snippet below shows how to configure the new Publish IIS tool in ``project.json`` file:
 
 .. code-block:: Json 
 
-  "tools": {
+  { 
+    "tools": {
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
-      "version": "1.0.0-*",
-      "imports": "portable-net45+wp80+win8+wpa81+dnxcore50"
-    }
-  },
-  "scripts": {
-    "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
+        "version": "1.0.0-*",
+        "imports": "portable-net45+wp80+win8+wpa81+dnxcore50"
+      }
+    },
+    "scripts": {
+      "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
+    } 
   }
 
 The ASP.NET Core Module must be configured in ``web.config``:
@@ -229,9 +276,14 @@ The ASP.NET Core Module must be configured in ``web.config``:
 The Publish IIS tool 
 ^^^^^^^^^^^^^^^^^^^^^
 
+The new ASP.NET Core Module replaces the IIS Platform Handler for ASP.NET Core apps. You configure the ASP.NET Core Module in web.config like this (show web.config)
+
+
+The Publish IIS tool  can generate the correct ``web.config`` for you when you publish. See `<Publishing to IIS https://docs.asp.net/en/latest/publishing/iis.html>`_ for more details.
+
 The name of the package that contains the Publish IIS tool was changed to ``Microsoft.AspNetCore.Server.IISIntegration.Tools``. This requires changing your ``project.json`` file to inlude the ``Microsoft.AspNetCore.Server.IISIntegration.Tools`` package instead of the ``dotnet-publish-iis`` package.
 
-You can use the Publish IIS tool to publish your app with the ``web.config`` file that is required for your target environment. More information about Publish IIS changes is at https://github.com/aspnet/Announcements/issues/164.
+You can use the Publish IIS tool to publish your app with the ``web.config`` file that is required for your target environment. More information about Publish IIS changes is at `<https://github.com/aspnet/Announcements/issues/164>`_.
 
 IIS integration middleware is now setup using ``WebHostBuilder`` in ``Program.Main()``, and is no longer called in the ``Configure()`` method of the ``Startup`` class. 
 
@@ -253,83 +305,20 @@ Applicationhost.config
 ^^^^^^^^^^^^^^^^^^^^^^
 
 If ``applicationhost.config`` was created with RC1 or early RC2 it will point to a wrong application folder. The ``applicationhost.config`` file will read ``wwwroot`` as the application folder and this is where IIS will look for ``web.config`` file. However, since the ``web.config`` file now goes in the ``approot``, IIS won't find the file and the user may not be able to start the appliation with IIS.
-  
-
-Json configuration syntax change 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-``ConfigurationRoot.ReloadOnChanged()`` is no longer available, add is added explicitly via ``ConfigurationBuilder.AddJsonFile()``.
 
 Global.json
 ^^^^^^^^^^^
 
-You must update the sdk version in ``global.json``, as this file is used to configure the solution as a whole.
+You must update the SDK version in ``global.json``, as this file is used to configure the version of the .NET Core SDK to use during development.
 
-.. code-block:: c#  
+.. code-block:: json
 
   {
     "projects": [ "src", "test" ],
     "sdk": {
-      "version": "1.0.0-rc2-final"
+      "version": "1.0.0-preview1-002702"
     }
   }
-
-
-Changes in views
-^^^^^^^^^^^^^^^^
-
-Views now support relative paths. 
-
-The Validation Summary Tag Helper has changed. 
-
-RC1:
-
-.. code-block:: html 
-
-  <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div> 
-
-RC2:
-
-.. code-block:: html
-
-  <div asp-validation-summary="All" class="text-danger"></div>
-
-ViewComponents changes
-^^^^^^^^^^^^^^^^^^^^^^
-
-The Sync APIs have been removed.
-
-To reduce ambiguity in ViewComponent method selection, we've modified the selection to only allow exactly one ``Invoke()`` or ``InvokeAsync()`` per ViewComponent.
-``Component.Render()``, ``Component.RenderAsync()``, and ``Component.Invoke()`` have been removed.
-
-``InvokeAsync()`` now takes an anonynmous object instead of separate parameters. To use the view component, call @Component.InvokeAsync("Name of view component", <parameters>) from a view. The parameters will be passed to the ``InvokeAsync()`` method. The following example demonstrates the ``InvokeAsync()`` method call with two parameters:
-
-.. code-block:: c#  
-
-  // RC1 signature 
-  @Component.InvokeAsync("Test", "MyName", 15)  
-
-  // RC2 signatures
-  @Component.InvokeAsync("Test", new { name = "MyName", age = 15 })
- 
-  @Component.InvokeAsync("Test", new Dictionary<string, object> { ["name"] = "MyName", ["age"] = 15 })
-
-  @Component.InvokeAsync<TestViewComponent>(new { name = "MyName", age = 15})
-
-Updated controller discovery rules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-There are changes that simplify controller discovery:
-
-There is a new ``Controller`` attribute that can be used to mark a class and their descendants as controllers.
-Classes whose name doesn't end in ``Controller`` and derive from a base class that ends in ``Controller`` are no longer considered controllers. In this scenario the ``[Controller]`` attribute must be applied to the ``Controller`` class itself or to the base class.
-
-We now consider a type to be a controller if all of the following rules apply:
-
-- The type is a public, concrete, non open generic class.
-- [NonController] is not applied to any type of the hierarchy.
-- The type name ends with ``Controller``, or if the ``[Controller]`` attribute is applied to the type or to one of its ancestors.
-- It's important to note that if ``[NonController]`` is applied anywhere in the type hierarchy the discovery conventions will never consider that type or its descendants to be a controller. ``[NonController]`` takes precedence over ``[Controller]``.
 
 
 Configuration
@@ -337,7 +326,12 @@ Configuration
 
 ``IConfigurationSource`` has been introduced to represent the settings/configuration which is used to ``Build()`` an ``IConfigurationProvider``. It is no longer possible to access the provider instances from ``IConfigurationBuilder`` only the sources. This is intentional, but may cause loss of functionality as you can longer do things like explicitly call ``Load`` on the provider instances.
 
-``FileConfigurationProvider`` base class has been introduced as a common root for Json/Xml/Ini providers. This allows the ability to specify an ``IFileProvider`` on the source which will be used to read the file instead of explicitly using ``File.Open()``. The side effect of this change is that absolute paths are no longer supported. The file path must be relative to the base path of the ``IConfigurationBuilder``'s basepath or the ``IFileProvider``, if specified.
+``FileConfigurationProvider`` base class has been introduced as a common root for JSON/XML/INI providers. This allows the ability to specify an ``IFileProvider`` on the source which will be used to read the file instead of explicitly using ``File.Open()``. The side effect of this change is that absolute paths are no longer supported. The file path must be relative to the base path of the ``IConfigurationBuilder``'s basepath or the ``IFileProvider``, if specified.
+
+JSON configuration syntax change 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``ConfigurationRoot.ReloadOnChanged()`` is no longer available, add is added explicitly via ``ConfigurationBuilder.AddJsonFile()``.
 
 	   
 Entity Framework
@@ -363,34 +357,6 @@ Debug	       Trace
 
 ``ILoggerFactory`` no longer contains ``AddConsole``.
 
-Visual Studio Templates
------------------------
-
-ASP.NET Web Application for version 4.5.2 are still available. The ASP.NET Core templates are as follows:
-
-- ASP.NET Core Web Application
-  - Empty 
-  - Web API 
-  - Web Application 
-- ASP.NET Core Web Application on .NET Framework
-
-Updating Launch Settings in Visual Studio
------------------------------------------
-
-Update ``launchSettings.json`` to remove web target and add the following:
-
-.. code-block:: c# 
-
-  "WebApplication1": {
-     "commandName": "Project",
-     "launchBrowser": true,
-     "launchUrl": "http://localhost:5000",
-     "environmentVariables": {
-       "ASPNETCORE_ENVIRONMENT": "Development"
-     }
-  } 
-
-
 Identity API updates
 --------------------
 
@@ -412,3 +378,20 @@ To use the Identity API in views, add the following directives to the view:
   @using Microsoft.AspNetCore.Identity
   @inject SignInManager SignInManager
   @inject UserManager UserManager
+
+Updating Launch Settings in Visual Studio
+-----------------------------------------
+
+Update ``launchSettings.json`` to remove web target and add the following:
+
+.. code-block:: c# 
+
+  "WebApplication1": {
+     "commandName": "Project",
+     "launchBrowser": true,
+     "launchUrl": "http://localhost:5000",
+     "environmentVariables": {
+       "ASPNETCORE_ENVIRONMENT": "Development"
+     }
+  } 
+
