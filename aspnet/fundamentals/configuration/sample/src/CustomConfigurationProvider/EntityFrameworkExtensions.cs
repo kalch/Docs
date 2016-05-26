@@ -6,7 +6,8 @@ namespace CustomConfigurationProvider
 {
     public static class EntityFrameworkExtensions
     {
-        public static IConfigurationBuilder AddEntityFramework(this IConfigurationBuilder builder, Action<DbContextOptionsBuilder> setup)
+        public static IConfigurationBuilder AddEntityFrameworkConfigSource(
+            this IConfigurationBuilder builder, Action<DbContextOptionsBuilder> setup)
         {
             return builder.Add(new EntityFrameworkConfigurationSource(setup));
         }

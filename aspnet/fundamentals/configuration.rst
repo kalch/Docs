@@ -4,7 +4,7 @@ Configuration
 =============
 `Steve Smith`_, `Daniel Roth`_
 
-ASP.NET Core supports a variety of different configuration options. Application configuration data can come from files using built-in support for JSON, XML, and INI formats, as well as from environment variables. You can also write your own :ref:`custom configuration provider <custom-config-providers>`.
+ASP.NET Core supports a variety of different configuration options. Application configuration data can come from files using built-in support for JSON, XML, and INI formats, as well as from environment variables. You can also write your own :ref:`custom configuration source <custom-config-providers>`.
 
 .. contents:: Sections:
   :local:
@@ -19,21 +19,20 @@ ASP.NET Core's configuration system has been re-architected from previous versio
 
 To work with settings in your ASP.NET application, it is recommended that you only instantiate an instance of ``Configuration`` in your application's ``Startup`` class. Then, use the :ref:`Options pattern <options-config-objects>` to access individual settings.
 
-At its simplest, the ``Configuration`` class is just a collection of ``Providers``, which provide the ability to read and write name/value pairs. You must configure at least one provider in order for ``Configuration`` to function correctly. The following sample shows how to test working with ``Configuration`` as a key/value store:
+At its simplest, the ``Configuration`` class is just a collection of ``Sources``, which provide the ability to read and write name/value pairs. You must configure at least one source in order for ``Configuration`` to function correctly. The following sample shows how to test working with ``Configuration`` as a key/value store:
 
 .. code-block:: c#
 
-  // assumes using Microsoft.Framework.ConfigurationModel is specified
   var builder = new ConfigurationBuilder();
-  builder.Add(new MemoryConfigurationProvider());
+  builder.AddInMemoryCollection();
   var config = builder.Build();
   config.Set("somekey", "somevalue");
 
   // do some other work
 
-  string setting2 = config["somekey"]; // also returns "somevalue"
+  var setting2 = config["somekey"]; // also returns "somevalue"
 
-.. note:: You must set at least one configuration provider.
+.. note:: You must set at least one configuration source.
 
 It's not unusual to store configuration values in a hierarchical structure, especially when using external files (e.g. JSON, XML, INI). In this case, configuration values can be retrieved using a ``:`` separated key, starting from the root of the hierarchy. For example, consider the following *appsettings.json* file:
 
@@ -42,25 +41,25 @@ It's not unusual to store configuration values in a hierarchical structure, espe
 .. literalinclude:: /../common/samples/WebApplication1/src/WebApplication1/appsettings.json
   :language: json
 
-The application uses configuration to configure the right connection string. Access to the ``ConnectionString`` setting is achieved through this key: ``Data:DefaultConnection:ConnectionString``.
+The application uses configuration to configure the right connection string. Access to the ``ConnectionString`` setting is achieved through ``config.GetConnectionString("DefaultConnection")``.
 
 The settings required by your application and the mechanism used to specify those settings (configuration being one example) can be decoupled using the :ref:`options pattern <options-config-objects>`. To use the options pattern you create your own settings class (probably several different classes, corresponding to different cohesive groups of settings) that you can inject into your application using an options service. You can then specify your settings using configuration or whatever mechanism you choose.
 
 .. note:: You could store your ``Configuration`` instance as a service, but this would unnecessarily couple your application to a single configuration system and specific configuration keys. Instead, you can use the :ref:`Options pattern <options-config-objects>` to avoid these issues.
 
-Using the built-in providers
-----------------------------
+Using the built-in configuration sources
+----------------------------------------
 
-The configuration framework has built-in support for JSON, XML, and INI configuration files, as well as support for in-memory configuration (directly setting values in code) and the ability to pull configuration from environment variables and command line parameters. Developers are not limited to using a single configuration provider. In fact several may be set up together such that a default configuration is overridden by settings from another provider if they are present.
+The configuration framework has built-in support for JSON, XML, and INI configuration files, as well as support for in-memory configuration (directly setting values in code) and the ability to pull configuration from environment variables and command line parameters. Developers are not limited to using a single configuration source. In fact several may be set up together such that a default configuration is overridden by settings from another source if they are present.
 
-Adding support for additional configuration file providers is accomplished through extension methods. These methods can be called on a ``ConfigurationBuilder`` instance in a standalone fashion, or chained together as a fluent API. Both of these approaches are demonstrated in the sample below.
+Adding support for additional configuration file sources is accomplished through extension methods. These methods can be called on a ``ConfigurationBuilder`` instance in a standalone fashion, or chained together as a fluent API. Both of these approaches are demonstrated in the sample below.
 
 .. _custom-config:
 
 .. literalinclude:: configuration/sample/src/CustomConfigurationProvider/Program.cs
   :dedent: 12
   :language: c#
-  :lines: 12-19
+  :lines: 12-25
 
 The order in which configuration providers are specified is important, as this establishes the precedence with which settings will be applied if they exist in multiple locations. In the example above, if the same setting exists in both *appsettings.json* and in an environment variable, the setting from the environment variable will be the one that is used. The last configuration provider specified "wins" if a setting exists in more than one location. The ASP.NET team recommends specifying environment variables last, so that the local environment can override anything set in deployed configuration files.
 
@@ -140,10 +139,10 @@ You can have multiple ``IConfigureOptions<TOption>`` services for the same optio
 
 .. _custom-config-providers:
 
-Writing custom providers
+Writing custom sources
 ------------------------
 
-In addition to using the built-in configuration providers, you can also write your own. To do so, you simply inherit from ``ConfigurationProvider``, and populate the ``Data`` property with the settings from your configuration provider.
+In addition to using the built-in configuration providers, you can also write your own. To do so, you simply inherit from ``ConfigurationProvider``, and populate the ``Data`` property with the settings from your configuration source.
 
 Example: Entity Framework Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -164,12 +163,14 @@ You need a ``ConfigurationContext`` to store and access the configured values us
   :lines: 5-12
   :dedent: 4
 
+Next, create
+  
 Next, create the custom configuration provider by inheriting from ``ConfigurationProvider``. The configuration data is loaded by overriding the ``Load`` method, which reads in all of the configuration data from the configured database. For demonstration purposes, the configuration provider also takes care of initializing the database if it hasn't already been created and populated:
 
 .. literalinclude:: configuration/sample/src/CustomConfigurationProvider/EntityFrameworkConfigurationProvider.cs
   :language: c#
 
-By convention you can also add an ``AddEntityFramework`` extension method for adding the configuration provider:
+By convention you can also add an ``AddEntityFrameworkConfigSource`` extension method for adding the configuration source:
 
 .. literalinclude:: configuration/sample/src/CustomConfigurationProvider/EntityFrameworkExtensions.cs
   :language: c#
@@ -191,4 +192,4 @@ Run the application to see the configured values:
 Summary
 -------
 
-ASP.NET Core provides a very flexible configuration model that supports a number of different file-based options, as well as command-line, in-memory, and environment variables. It works seamlessly with the options model so that you can inject strongly typed settings into your application or framework. You can create your own custom configuration providers as well, which can work with or replace the built-in providers, allowing for extreme flexibility. 
+ASP.NET Core provides a very flexible configuration model that supports a number of different file-based options, as well as command-line, in-memory, and environment variables. It works seamlessly with the options model so that you can inject strongly typed settings into your application or framework. You can create your own custom configuration sources as well, which can work with or replace the built-in sources, allowing for extreme flexibility. 
