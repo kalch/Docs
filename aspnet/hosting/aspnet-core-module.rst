@@ -135,10 +135,10 @@ ASP.NET Core Module configuration examples
 
 .. _log-redirection:
 
-Log Redirection
-^^^^^^^^^^^^^^^
+Log creation and redirection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ASP.NET Core Module can redirect ``stdout`` and ``stderr`` logs to disk by setting the ``stdoutLogEnabled``  and ``stdoutLogFile`` properties of the ``aspNetCore`` attribute. However, the ASP.NET Core Module does not rotate logs and it is the responsibilty of the hoster to limit the disk space the logs consume.
+For logs to be saved, you must create the log directory. The ASP.NET Core Module can redirect ``stdout`` and ``stderr`` logs to disk by setting the ``stdoutLogEnabled``  and ``stdoutLogFile`` properties of the ``aspNetCore`` attribute. Logs are not rotated. It is the responsibilty of the hoster to limit the disk space the logs consume.
 
 .. literalinclude:: aspnet-core-module/sample/web.config
   :language: xml
