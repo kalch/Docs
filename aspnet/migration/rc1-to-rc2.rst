@@ -32,11 +32,10 @@ To compile views, set the ``preserveCompilationContext`` option in ``project.jso
 .. code-block:: json 
 
   {
-    "buildOptions": {
-      "emitEntryPoint": true,
-      "preserveCompilationContext": true
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "preserveCompilationContext": true
   },
-
 
 You no longer need to reference the Tag Helper package ``Microsoft.AspNet.Mvc.TagHelpers``, which was renamed to ``Microsoft.AspNetCore.Mvc.TagHelpers`` in RC2. The package is now referenced by MVC by default.
 
@@ -151,12 +150,14 @@ Additionally, you must turn on server garbage collection in ``project.json`` or,
 
 .. code-block:: json
 
-  "runtimeOptions": {
-    "configProperties": {
-      "System.GC.Server": true
+  {
+    "runtimeOptions": {
+      "configProperties": {
+        "System.GC.Server": true
+      }
     }
   }
-  
+
 "The default server URL and port are ``localhost:5000``. You can find more information about Garbage Collection configuration at: https://github.com/aspnet/Announcements/issues/175
 
 WebHostBuilder API updates
@@ -319,7 +320,6 @@ You must update the SDK version in ``global.json``, as this file is used to conf
       "version": "1.0.0-preview1-002702"
     }
   }
-
 
 Configuration
 -------------
