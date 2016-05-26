@@ -1,5 +1,3 @@
-.. _aspnet-core-module:
-
 ASP.NET Core Module Configuration Reference
 =============================================
 
