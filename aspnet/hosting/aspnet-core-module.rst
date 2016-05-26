@@ -124,7 +124,15 @@ Child Elements
 |                           | | for the process specified in **processPath**.    |
 +---------------------------+----------------------------------------------------+
 
-ASP.NET Core Module Configuration Examples
+ASP.NET Core Module app offline
+-------------------------------
+
+If you place a file with the name  *app_offline.htm* at the root of a web application directory, the ASP.NET Core Module will shut-down the application and stop processing any new incoming requests for that application. The ASP.NET Core Module will respond to all requests for dynamic pages in the application by sending back the content of the  *app_offline.htm*  file. For example, you might want to return a "site under construction" or a "down for maintenance" page.
+
+Once the *app_offline.htm* file is removed, the next request will load the application and the application will respond to requests.
+
+
+ASP.NET Core Module configuration examples
 ------------------------------------------
 
 .. _log-redirection:
@@ -139,7 +147,7 @@ The ASP.NET Core Module can redirect ``stdout`` and ``stderr`` logs to disk by s
   :lines: 12-16,20
 
 
-Setting Environment Variables
+Setting environment variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ASP.NET Core Module allows you specify environment variables for the process specified in the ``processPath`` setting by specifying them in ``environmentVariables`` child attribute to the ``aspNetCore`` attribute. The example below illustrates how you would use it.
